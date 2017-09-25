@@ -9,15 +9,15 @@ public class scAIManager : MonoBehaviour
 
     public enum enCharacterType
     {
-        Player,
-        PlayerDude,
-        Enemy
+        Player, // player avatar
+        PlayerDude, // solider help player
+        Enemy // enemy
     }
     public enCharacterType characterType;
     public int Health = 100;
-    public float FireSpeed = 1.1f;
-    public int SightDegree = 45;
-    public float EnemySight = 3;
+    public float FireSpeed = 1.1f;// Fire Speed By type of gun
+    public int SightDegree = 45; // how much degree can see 
+    public float EnemySight = 3; // use for Physics.BoxCastAll’s halfExtend
     public float VisibilityDistance = 20;
 
     public GameObject Target;
@@ -26,7 +26,7 @@ public class scAIManager : MonoBehaviour
     public int BulletMag = 20;
 
     public bool Reloading = false;
-    public scForts MyFort;
+    public scForts MyFort; // current character use this Fort and each fort have one or more position to Stay (FortsChild.Count)
     //public bool HaveFort = true;
     public float transitionDuration = 2;
     public int StartHealthTemp;
@@ -42,7 +42,7 @@ public class scAIManager : MonoBehaviour
         instance = this;
     }
     
-    public void FortsFinder(List<scForts> FortsList)
+    public void FortsFinder(List<scForts> FortsList)//Find empty and Nearest Fort
     {
         float tempA = 0, tempB = 0;
         for (int i = 0; i < FortsList.Count; i++)
@@ -70,11 +70,11 @@ public class scAIManager : MonoBehaviour
         {
             MyFort.EnemyInMyForts.Add(gameObject);
             Transform FortsTarget = MyFort.FortsChild[MyFort.EnemyInMyForts.Count - 1].gameObject.transform;
-            StartCoroutine(Transition(1, FortsTarget));
+            StartCoroutine(Transition(1, FortsTarget));//go to forts child
         }
         else
         {
-            //stay and fire;
+            //stay and fire or do something else;
         }
     }
 
@@ -90,14 +90,13 @@ public class scAIManager : MonoBehaviour
     public RaycastHit[] hits;
     public void LookForward()
     {
-        // Detect if player or PlayerDude is within the field of view
-        RotateForDiscover();
+        RotateForDiscover(); // rotate current character to expand it’s field of view
         if (hits.Length > 0)
         {
             float tempA = 0, tempB = 0;
             for (int i = 0; i < hits.Length; i++)
             {
-                if (characterType == enCharacterType.Enemy)
+                if (characterType == enCharacterType.Enemy)// Detect if player or PlayerDude is within the field of view
                 {
                     if (hits[i].collider.tag == "Player" || hits[i].collider.tag == "PlayerDude")
                     {
@@ -189,13 +188,13 @@ public class scAIManager : MonoBehaviour
             Reloading = true;
         }
     }
-    public void _ReloadDone()
+    public void _ReloadDone()// used in animation Event
     {
         Reloading = false;
         BulletShooted = 0;
     }
 
-    public virtual void _Shoot()
+    public virtual void _Shoot() // used in animation Event, Instantiate Bullet and bullet use its own script to move toward on target
     {
         BulletShooted++;
         GameObject BulletGO = Instantiate(Bullet, Muzzle.transform.position, Quaternion.identity);
